@@ -11,6 +11,14 @@ export type ViaCEPAddress = {
   uf: string,
 };
 
+export type ViaCEPAddressResponse = {
+  logradouro: string,
+  complemento: string,
+  bairro: string,
+  cidade: string,
+  uf: string,
+};
+
 export type RequestError = {
   status: number,
   data: object | null,
