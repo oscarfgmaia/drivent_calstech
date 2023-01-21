@@ -16,6 +16,7 @@ export async function getEnrollmentByUser(req: AuthenticatedRequest, res: Respon
   }
 }
 
+//AuthenticatedRequest
 export async function postCreateOrUpdateEnrollment(req: AuthenticatedRequest, res: Response) {
   try {
     await enrollmentsService.createOrUpdateEnrollmentWithAddress({
@@ -28,8 +29,8 @@ export async function postCreateOrUpdateEnrollment(req: AuthenticatedRequest, re
     return res.sendStatus(httpStatus.BAD_REQUEST);
   }
 }
-
-export async function getAddressFromCEP(req: Request, res: Response) {
+//AuthenticatedRequest
+export async function getAddressFromCEP(req: AuthenticatedRequest, res: Response) {
   const { cep } = req.query as Record<string, string>;
   try {
     const response = await axios.get(`https://viacep.com.br/ws/${cep}/json/`);
