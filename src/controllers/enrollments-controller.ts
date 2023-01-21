@@ -1,8 +1,9 @@
-import { AuthenticatedRequest } from "@/middlewares";
-import enrollmentsService from "@/services/enrollments-service";
-import { Response } from "express";
-import httpStatus from "http-status";
-
+import { AuthenticatedRequest } from '@/middlewares';
+import enrollmentsService from '@/services/enrollments-service';
+import axios from 'axios';
+import { Response, Request } from 'express';
+import httpStatus from 'http-status';
+import { ViaCEPAddress, ViaCEPAddressResponse } from '@/protocols';
 export async function getEnrollmentByUser(req: AuthenticatedRequest, res: Response) {
   const { userId } = req;
 
@@ -28,16 +29,20 @@ export async function postCreateOrUpdateEnrollment(req: AuthenticatedRequest, re
   }
 }
 
-export async function getAddressFromCEP(req: AuthenticatedRequest, res: Response) {
+export async function getAddressFromCEP(req: Request, res: Response) {
   const { cep } = req.query as Record<string, string>;
-
   try {
-    const address = await enrollmentsService.getAddressFromCEP();
-    res.status(httpStatus.OK).send(address);
+    const response = await axios.get(`https://viacep.com.br/ws/${cep}/json/`);
+    const responseObj = response.data as ViaCEPAddress;
+    const newViaCep = {
+      bairro: responseObj.bairro,
+      cidade: responseObj.localidade,
+      uf: responseObj.uf,
+      complemento: responseObj.complemento,
+      logradouro: responseObj.logradouro,
+    } as ViaCEPAddressResponse;
+    res.send(newViaCep);
   } catch (error) {
-    if (error.name === "NotFoundError") {
-      return res.send(httpStatus.NO_CONTENT);
-    }
+    return res.sendStatus(httpStatus.BAD_REQUEST);
   }
 }
-
