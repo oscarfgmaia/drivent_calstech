@@ -9,12 +9,9 @@ import { ViaCEPAddressResponse } from "@/protocols";
 async function getAddressFromCEP(cep: string): Promise<ViaCEPAddressResponse> {
   const result = await request.get(`https://viacep.com.br/ws/${cep}/json/`);
   if (!result.data) {
-    throw notFoundError();
+    throw invalidDataError(["Please put a valid body"]);
   } else if (result.data.erro) {
-    throw {
-      name: "noContent",
-      message: "There's no content with this search",
-    };
+    throw notFoundError();
   } else {
     const viaCepResult: ViaCEPAddressResponse = {
       logradouro: result.data.logradouro,
@@ -60,7 +57,7 @@ async function createOrUpdateEnrollmentWithAddress(params: CreateOrUpdateEnrollm
     const newEnrollment = await enrollmentRepository.upsert(params.userId, enrollment, exclude(enrollment, "userId"));
     await addressRepository.upsert(newEnrollment.id, address, address);
   } catch (error) {
-    throw invalidDataError(["Please put a valid body"]);
+    throw error
   }
 }
 
