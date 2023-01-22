@@ -33,16 +33,8 @@ export async function postCreateOrUpdateEnrollment(req: AuthenticatedRequest, re
 export async function getAddressFromCEP(req: AuthenticatedRequest, res: Response) {
   const { cep } = req.query as Record<string, string>;
   try {
-    const response = await axios.get(`https://viacep.com.br/ws/${cep}/json/`);
-    const responseObj = response.data as ViaCEPAddress;
-    const newViaCep = {
-      bairro: responseObj.bairro,
-      cidade: responseObj.localidade,
-      uf: responseObj.uf,
-      complemento: responseObj.complemento,
-      logradouro: responseObj.logradouro,
-    } as ViaCEPAddressResponse;
-    res.send(newViaCep);
+    const result = await enrollmentsService.getAddressFromCEP(cep)
+    res.send(result)
   } catch (error) {
     return res.sendStatus(httpStatus.BAD_REQUEST);
   }
